@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>JobTrack</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>JobTrack 💼</h1>
+        <p>Track your job applications easily</p>
+    </div>
+
+    <div class="section-header">
+        <h2>My Job Applications</h2>
+
+        <a href="/add" class="add-btn">
+            + Add Job Application
+        </a>
+    </div>
+    <div class="dashboard">
+
+    <div class="dashboard-card total-card">
+        <h3>Total Applications</h3>
+        <strong>{{ total }}</strong>
+        <p>100%</p>
+    </div>
+
+    <div class="dashboard-card applied-card">
+        <h3>Applied</h3>
+        <strong>{{ applied }}</strong>
+
+        <p>
+            {% if total > 0 %}
+                {{ ((applied / total) * 100)|round(0) }}%
+            {% else %}
+                0%
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="dashboard-card interview-card">
+        <h3>Interviews</h3>
+        <strong>{{ interview }}</strong>
+
+        <p>
+            {% if total > 0 %}
+                {{ ((interview / total) * 100)|round(0) }}%
+            {% else %}
+                0%
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="dashboard-card selected-card">
+        <h3>Selected</h3>
+        <strong>{{ selected }}</strong>
+
+        <p>
+            {% if total > 0 %}
+                {{ ((selected / total) * 100)|round(0) }}%
+            {% else %}
+                0%
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="dashboard-card rejected-card">
+        <h3>Rejected</h3>
+        <strong>{{ rejected }}</strong>
+
+        <p>
+            {% if total > 0 %}
+                {{ ((rejected / total) * 100)|round(0) }}%
+            {% else %}
+                0%
+            {% endif %}
+        </p>
+    </div>
+
+</div>
+    <div class="status-chart">
+
+    <h2>Application Status</h2>
+
+    <div class="progress-item">
+        <div class="progress-label">
+            <span>Applied</span>
+            <strong>{{ ((applied / total) * 100)|round(0) if total > 0 else 0 }}%</strong>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill applied-progress"
+                 style="width: {{ ((applied / total) * 100) if total > 0 else 0 }}%;">
+            </div>
+        </div>
+    </div>
+
+
+    <div class="progress-item">
+        <div class="progress-label">
+            <span>Interview</span>
+            <strong>{{ ((interview / total) * 100)|round(0) if total > 0 else 0 }}%</strong>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill interview-progress"
+                 style="width: {{ ((interview / total) * 100) if total > 0 else 0 }}%;">
+            </div>
+        </div>
+    </div>
+
+
+    <div class="progress-item">
+        <div class="progress-label">
+            <span>Selected</span>
+            <strong>{{ ((selected / total) * 100)|round(0) if total > 0 else 0 }}%</strong>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill selected-progress"
+                 style="width: {{ ((selected / total) * 100) if total > 0 else 0 }}%;">
+            </div>
+        </div>
+    </div>
+
+
+    <div class="progress-item">
+        <div class="progress-label">
+            <span>Rejected</span>
+            <strong>{{ ((rejected / total) * 100)|round(0) if total > 0 else 0 }}%</strong>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill rejected-progress"
+                 style="width: {{ ((rejected / total) * 100) if total > 0 else 0 }}%;">
+            </div>
+        </div>
+    </div>
+
+</div>
+    <div class="recent-section">
+
+    <div class="recent-header">
+        <h2>Recent Applications</h2>
+        <span>{{ total }} Applications</span>
+    </div>
+
+    {% for job in jobs[:5] %}
+
+    <div class="recent-job">
+
+        <div>
+            <h3>{{ job['position'] }}</h3>
+            <p>{{ job['company'] }}</p>
+        </div>
+
+        <div class="recent-status
+            {% if job['status'] == 'Applied' %}
+                recent-applied
+            {% elif job['status'] == 'Interview' %}
+                recent-interview
+            {% elif job['status'] == 'Selected' %}
+                recent-selected
+            {% elif job['status'] == 'Rejected' %}
+                recent-rejected
+            {% endif %}
+        ">
+            {{ job['status'] }}
+        </div>
+
+        <div class="recent-date">
+            {{ job['application_date'] }}
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+    {% if jobs %}
+
+        {% for job in jobs %}
+
+        <div class="job-card">
+
+            <h3>{{ job['position'] }}</h3>
+
+            <div class="job-info">
+
+                <div class="info-box">
+                    <span>Company</span>
+                    <strong>{{ job['company'] }}</strong>
+                </div>
+
+                <div class="info-box">
+                    <span>Status</span>
+
+                    <span class="status
+                        {% if job['status'] == 'Applied' %}
+                            status-applied
+                        {% elif job['status'] == 'Interview' %}
+                            status-interview
+                        {% elif job['status'] == 'Selected' %}
+                            status-selected
+                        {% elif job['status'] == 'Rejected' %}
+                            status-rejected
+                        {% endif %}
+                    ">
+                        {{ job['status'] }}
+                    </span>
+                </div>
+
+                <div class="info-box">
+                    <span>Application Date</span>
+                    <strong>{{ job['application_date'] }}</strong>
+                </div>
+
+            </div>
+
+            <div class="actions">
+
+                {% if job[3] %}
+                    <a href="{{ job[3] }}"
+                       target="_blank"
+                       class="view-btn">
+                        🔗 View Job
+                    </a>
+                {% endif %}
+
+                <a href="/edit/{{ job[0] }}"
+                   class="edit-btn">
+                    ✏️ Edit
+                </a>
+
+                <a href="/delete/{{ job['id'] }}"
+                   class="delete-btn"
+                   onclick="return confirm('Are you sure you want to delete this application?')">
+                    🗑️ Delete
+                </a>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty">
+            <h3>No job applications yet 📭</h3>
+            <p>Start tracking your applications by adding your first job.</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
